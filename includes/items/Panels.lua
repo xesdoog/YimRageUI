@@ -3,6 +3,9 @@
 --- @version 1.0.0
 --- created at [24/05/2021 10:02]
 ---
+--- Ported To YimMenu-Lua by SAMURAI (xesdoog)
+--- File Modified: [02/01/2024 17:56]
+--- 
 
 ---@class Panels
 Panels = {};
@@ -66,10 +69,10 @@ local function UIGridPanel(Type, StartedX, StartedY, TopText, BottomText, LeftTe
             Graphics.Text(RightText or "", CurrentMenu.X + Grid.Text.Right.X + (CurrentMenu.WidthOffset / 2), CurrentMenu.Y + Grid.Text.Right.Y + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 0, Grid.Text.Right.Scale, 245, 245, 245, 255, 1)
         end
         if Hovered then
-            if IsDisabledControlPressed(0, 24) then
+            if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) then
                 Selected = true
-                CircleX = math.round(GetControlNormal(2, 239) * 1920) - CurrentMenu.SafeZoneSize.X - (Grid.Circle.Width / 2)
-                CircleY = math.round(GetControlNormal(2, 240) * 1080) - CurrentMenu.SafeZoneSize.Y - (Grid.Circle.Height / 2)
+                CircleX = math.round(PAD.GET_CONTROL_NORMAL(2, 239) * 1920) - CurrentMenu.SafeZoneSize.X - (Grid.Circle.Width / 2)
+                CircleY = math.round(PAD.GET_CONTROL_NORMAL(2, 240) * 1080) - CurrentMenu.SafeZoneSize.Y - (Grid.Circle.Height / 2)
                 if CircleX > (CurrentMenu.X + Grid.Grid.X + (CurrentMenu.WidthOffset / 2) + 20 + Grid.Grid.Width - 40) then
                     CircleX = CurrentMenu.X + Grid.Grid.X + (CurrentMenu.WidthOffset / 2) + 20 + Grid.Grid.Width - 40
                 elseif CircleX < (CurrentMenu.X + Grid.Grid.X + 20 - (Grid.Circle.Width / 2)) then
@@ -116,7 +119,6 @@ end
 ---@param Action fun(X:number, Y:number, CharacterX:number, CharacterY:number)
 ---@param Index number
 ---@public
----@return void
 function Panels:Grid(StartedX, StartedY, TopText, BottomText, LeftText, RightText, Action, Index)
     UIGridPanel(GridType.Default, StartedX, StartedY, TopText, BottomText, LeftText, RightText, Action, Index)
 end
@@ -128,7 +130,6 @@ end
 ---@param Action fun(X:number, Y:number, CharacterX:number, CharacterY:number)
 ---@param Index number
 ---@public
----@return void
 function Panels:GridHorizontal(StartedX, LeftText, RightText, Action, Index)
     UIGridPanel(GridType.Horizontal, StartedX, nil, nil, nil, LeftText, RightText, Action, Index)
 end
@@ -140,7 +141,6 @@ end
 ---@param Action fun(X:number, Y:number, CharacterX:number, CharacterY:number)
 ---@param Index number
 ---@public
----@return void
 function Panels:GridVertical(StartedY, TopText, BottomText, Action, Index)
     UIGridPanel(GridType.Vertical, nil, StartedY, TopText, BottomText, nil, nil, Action, Index)
 end

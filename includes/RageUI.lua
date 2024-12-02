@@ -3,6 +3,9 @@
 --- @version 1.0.0
 --- created at [24/05/2021 10:02]
 ---
+--- Ported To YimMenu-Lua by SAMURAI (xesdoog)
+--- File Modified: [02/01/2024 17:50]
+--- 
 
 RageUI = {};
 
@@ -245,7 +248,7 @@ RageUI.Settings = {
 }
 
 function RageUI.GetSafeZoneBounds()
-    local SafeSize = GetSafeZoneSize()
+    local SafeSize = GRAPHICS.GET_SAFE_ZONE_SIZE()
     SafeSize = math.round(SafeSize, 2)
     SafeSize = (SafeSize * 100) - 90
     SafeSize = 10 - SafeSize
@@ -297,7 +300,7 @@ function RageUI.CloseAll()
     end
     RageUI.Options = 0
     RageUI.ItemOffset = 0
-    ResetScriptGfxAlign()
+    GRAPHICS.RESET_SCRIPT_GFX_ALIGN()
 end
 
 function RageUI.Banner()
@@ -359,9 +362,9 @@ function RageUI.Background()
     local CurrentMenu = RageUI.CurrentMenu;
     if (CurrentMenu.Display.Background) then
         RageUI.ItemsSafeZone(CurrentMenu)
-        SetScriptGfxDrawOrder(0)
+        GRAPHICS.SET_SCRIPT_GFX_DRAW_ORDER(0)
         Graphics.Sprite(RageUI.Settings.Items.Background.Dictionary, RageUI.Settings.Items.Background.Texture, CurrentMenu.X, CurrentMenu.Y + RageUI.Settings.Items.Background.Y + CurrentMenu.SubtitleHeight, RageUI.Settings.Items.Background.Width + CurrentMenu.WidthOffset, RageUI.ItemOffset, 0, 0, 0, 0, 255)
-        SetScriptGfxDrawOrder(1)
+        GRAPHICS.SET_SCRIPT_GFX_DRAW_ORDER(1)
     end
 end
 
@@ -380,7 +383,7 @@ end
 function RageUI.Render()
     local CurrentMenu = RageUI.CurrentMenu;
     if CurrentMenu.Safezone then
-        ResetScriptGfxAlign()
+        GRAPHICS.RESET_SCRIPT_GFX_ALIGN()
     end
 
     if (CurrentMenu.Display.InstructionalButton) then
@@ -388,7 +391,7 @@ function RageUI.Render()
             CurrentMenu:UpdateInstructionalButtons(true)
             CurrentMenu.InitScaleform = true
         end
-        DrawScaleformMovieFullscreen(CurrentMenu.InstructionalScaleform, 255, 255, 255, 255, 0)
+        GRAPHICS.DRAW_SCALEFORM_MOVIE_FULLSCREEN(CurrentMenu.InstructionalScaleform, 255, 255, 255, 255, 0)
     end
     CurrentMenu.Options = RageUI.Options
     CurrentMenu.SafeZoneSize = nil
@@ -470,8 +473,8 @@ function RageUI.ItemsSafeZone(CurrentMenu)
         CurrentMenu.SafeZoneSize = { X = 0, Y = 0 }
         if CurrentMenu.Safezone then
             CurrentMenu.SafeZoneSize = RageUI.GetSafeZoneBounds()
-            SetScriptGfxAlign(76, 84)
-            SetScriptGfxAlignParams(0, 0, 0, 0)
+            GRAPHICS.SET_SCRIPT_GFX_ALIGN(76, 84)
+            GRAPHICS.SET_SCRIPT_GFX_ALIGN_PARAMS(0, 0, 0, 0)
         end
     end
 end
@@ -487,17 +490,3 @@ function RageUI.Pool()
         end
     end
 end
-
-Citizen.CreateThread(function()
-    while true do
-        RageUI.PoolMenus.Timer = 250
-        if RageUI.PoolMenus.Name ~= nil then
-            RageUI.PoolMenus[RageUI.PoolMenus.Name]()
-        end
-        Citizen.Wait(RageUI.PoolMenus.Timer)
-        if RageUI.PoolMenus.Timer == 250 then
-            RageUI.PoolMenus.Name = nil
-            RageUI.Pool();
-        end
-    end
-end)

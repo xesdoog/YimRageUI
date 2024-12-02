@@ -3,7 +3,9 @@
 --- @version 1.0.0
 --- created at [24/05/2021 10:02]
 ---
-
+--- Ported To YimMenu-Lua by SAMURAI (xesdoog)
+--- File Modified: [02/01/2024 18:00]
+--- 
 
 local ItemsSettings = {
     CheckBox = {
@@ -55,7 +57,6 @@ Items = {}
 ---@param Actions fun(onSelected:boolean, onActive:boolean)
 ---@param Submenu any
 ---@public
----@return void
 function Items:AddButton(Label, Description, Style, Actions, Submenu)
     local CurrentMenu = RageUI.CurrentMenu
     local Option = RageUI.Options + 1
@@ -105,7 +106,7 @@ function Items:AddButton(Label, Description, Style, Actions, Submenu)
                 local Selected = (CurrentMenu.Controls.Select.Active)
                 Actions(Selected, Active)
                 if Selected then
-                    Audio.PlaySound(RageUI.Settings.Audio.Select.audioName, RageUI.Settings.Audio.Select.audioRef)
+                    Audio.PlaySound(RageUI.Settings.Audio.Select.audioName, RageUI.Settings.Audio.Select.audioRef, false)
                     if Submenu and Submenu() then
                         RageUI.NextMenu = Submenu
                     end
@@ -176,12 +177,12 @@ function Items:CheckBox(Label, Description, Checked, Style, Actions)
         if (Active) then
             if Style.RightLabel ~= nil and Style.RightLabel ~= "" then
                 Graphics.Text(Style.RightLabel, CurrentMenu.X + 420 - RightBadgeOffset + CurrentMenu.WidthOffset, CurrentMenu.Y + 4 + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 0, 0.35, 0, 0, 0, 255, 2)
-                BoxOffset = MeasureStringWidth(Style.RightLabel, 0, 0.35)
+                BoxOffset = Graphics.MeasureStringWidth(Style.RightLabel, 0, 0.35)
             end
         else
             if Style.RightLabel ~= nil and Style.RightLabel ~= "" then
                 Graphics.Text(Style.RightLabel, CurrentMenu.X + 420 - RightBadgeOffset + CurrentMenu.WidthOffset, CurrentMenu.Y + 4 + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 0, 0.35, 245, 245, 245, 255, 2)
-                BoxOffset = MeasureStringWidth(Style.RightLabel, 0, 0.35)
+                BoxOffset = Graphics.MeasureStringWidth(Style.RightLabel, 0, 0.35)
             end
         end
 
@@ -201,7 +202,7 @@ function Items:CheckBox(Label, Description, Checked, Style, Actions)
         if (Active) and (CurrentMenu.Controls.Select.Active) then
             Selected = true;
             Checked = not Checked
-            Audio.PlaySound(RageUI.Settings.Audio.Select.audioName, RageUI.Settings.Audio.Select.audioRef)
+            Audio.PlaySound(RageUI.Settings.Audio.Select.audioName, RageUI.Settings.Audio.Select.audioRef, false)
         end
 
         if (Active) then
@@ -220,7 +221,6 @@ end
 ---
 ---@param Label string
 ---@public
----@return void
 function Items:AddSeparator(Label)
     local CurrentMenu = RageUI.CurrentMenu
     local Option = RageUI.Options + 1
@@ -274,11 +274,11 @@ function Items:AddList(Label, Items, Index, Description, Style, Actions, Submenu
             if Active then
                 if Style.RightLabel ~= nil and Style.RightLabel ~= "" then
                     Graphics.Text(Style.RightLabel, CurrentMenu.X + 420 - RightBadgeOffset + CurrentMenu.WidthOffset, CurrentMenu.Y + 4 + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 0, 0.35, 0, 0, 0, 255, 2)
-                    RightOffset = Graphics.MeasureStringWidth(Style.RightLabel, 0, 0.35)
+                    RightOffset = Graphics.Graphics.MeasureStringWidth(Style.RightLabel, 0, 0.35)
                 end
             else
                 if Style.RightLabel ~= nil and Style.RightLabel ~= "" then
-                    RightOffset = Graphics.MeasureStringWidth(Style.RightLabel, 0, 0.35)
+                    RightOffset = Graphics.Graphics.MeasureStringWidth(Style.RightLabel, 0, 0.35)
                     Graphics.Text(Style.RightLabel, CurrentMenu.X + 420 - RightBadgeOffset + CurrentMenu.WidthOffset, CurrentMenu.Y + 4 + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 0, 0.35, 245, 245, 245, 255, 2)
                 end
             end
@@ -336,14 +336,14 @@ function Items:AddList(Label, Items, Index, Description, Style, Actions, Submenu
                         Index = #Items
                     end
                     onListChange = true
-                    Audio.PlaySound(RageUI.Settings.Audio.LeftRight.audioName, RageUI.Settings.Audio.LeftRight.audioRef)
+                    Audio.PlaySound(RageUI.Settings.Audio.LeftRight.audioName, RageUI.Settings.Audio.LeftRight.audioRef, false)
                 elseif (CurrentMenu.Controls.Right.Active) and not (CurrentMenu.Controls.Left.Active) then
                     Index = Index + 1
                     if Index > #Items then
                         Index = 1
                     end
                     onListChange = true
-                    Audio.PlaySound(RageUI.Settings.Audio.LeftRight.audioName, RageUI.Settings.Audio.LeftRight.audioRef)
+                    Audio.PlaySound(RageUI.Settings.Audio.LeftRight.audioName, RageUI.Settings.Audio.LeftRight.audioRef, false)
                 end
                 local Selected = (CurrentMenu.Controls.Select.Active)
                 Actions(Index, Selected, onListChange, Active)
@@ -363,6 +363,7 @@ end
 ---@param Mum number
 ---@param Dad number
 function Items:Heritage(Mum, Dad)
+    local mother, father = "", ""
     local CurrentMenu = RageUI.CurrentMenu;
     if Mum < 0 or Mum > 21 then
         Mum = 0
@@ -371,17 +372,17 @@ function Items:Heritage(Mum, Dad)
         Dad = 0
     end
     if Mum == 21 then
-        Mum = "special_female_" .. (tonumber(string.sub(Mum, 2, 2)) - 1)
+        mother = "special_female_" .. (tonumber(string.sub(Mum, 2, 2)) - 1)
     else
-        Mum = "female_" .. Mum
+        mother = "female_" .. Mum
     end
     if Dad >= 21 then
-        Dad = "special_male_" .. (tonumber(string.sub(Dad, 2, 2)) - 1)
+        father = "special_male_" .. (tonumber(string.sub(Dad, 2, 2)) - 1)
     else
-        Dad = "male_" .. Dad
+        father = "male_" .. Dad
     end
     Graphics.Sprite("pause_menu_pages_char_mom_dad", "mumdadbg", CurrentMenu.X, CurrentMenu.Y + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 431 + (CurrentMenu.WidthOffset / 1), 228)
-    Graphics.Sprite("char_creator_portraits", Dad, CurrentMenu.X + 195 + (CurrentMenu.WidthOffset / 2), CurrentMenu.Y + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 228, 228)
-    Graphics.Sprite("char_creator_portraits", Mum, CurrentMenu.X + 25 + (CurrentMenu.WidthOffset / 2), CurrentMenu.Y + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 228, 228)
+    Graphics.Sprite("char_creator_portraits", father, CurrentMenu.X + 195 + (CurrentMenu.WidthOffset / 2), CurrentMenu.Y + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 228, 228)
+    Graphics.Sprite("char_creator_portraits", mother, CurrentMenu.X + 25 + (CurrentMenu.WidthOffset / 2), CurrentMenu.Y + CurrentMenu.SubtitleHeight + RageUI.ItemOffset, 228, 228)
     RageUI.ItemOffset = RageUI.ItemOffset + 228
 end

@@ -1,8 +1,35 @@
+---@diagnostic disable: undefined-global, lowercase-global
 ---
 --- @author Dylan MALANDAIN, Kalyptus
 --- @version 1.0.0
---- created at [24/05/2021 10:02]
+--- Creation Date: [24/05/2021 10:02]
+--- Original Authors GitHub: https://github.com/ImBaphomettt | https://github.com/ItsikNox | https://github.com/Kalyptus
 ---
+--- Ported to YimMenu-Lua by SAMURAI (xesdoog)
+--- https://github.com/xesdoog
+--- Port Date: [02/01/2024 18:00]
+---
+
+local basePath = 'includes/'
+local modules  = {
+    'RageUI',
+    'Menu',
+    'MenuController',
+    'components/Audio',
+    'components/Visual',
+    'components/Graphics',
+    'components/Util',
+    'components/Keys',
+    'elements/ItemsBadge',
+    'elements/ItemsColour',
+    'elements/PanelColour',
+    'items/Items',
+    'items/Panels',
+}
+
+for _, module in pairs(modules) do
+    require(string.format("%s%s", basePath, module))
+end
 
 local MainMenu = RageUI.CreateMenu("Title", "SUBTITLE");
 MainMenu.EnableMouse = true;
@@ -18,7 +45,7 @@ function RageUI.PoolMenus:Example()
 	MainMenu:IsVisible(function(Items)
 		Items:Heritage(1, 2)
 		Items:AddButton("Sub Menu", "Sub Menu", { IsDisabled = false }, function(onSelected)
-	
+
 		end, SubMenu)
 		Items:AddButton("Hello world", "Hello world.", { IsDisabled = false }, function(onSelected)
 
@@ -53,6 +80,20 @@ function RageUI.PoolMenus:Example()
 	end)
 end
 
-Keys.Register("E", "E", "Test", function()
+script.register_looped("RAGEUI", function(rageui)
+    while true do
+        RageUI.PoolMenus.Timer = 250
+        if RageUI.PoolMenus.Name ~= nil then
+            RageUI.PoolMenus[RageUI.PoolMenus.Name]()
+        end
+        rageui:sleep(RageUI.PoolMenus.Timer)
+        if RageUI.PoolMenus.Timer == 250 then
+            RageUI.PoolMenus.Name = nil
+            RageUI.Pool();
+        end
+    end
+end)
+
+RegisterKeyMapping("F5", "Test", function()
 	RageUI.Visible(MainMenu, not RageUI.Visible(MainMenu))
 end)

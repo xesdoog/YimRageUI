@@ -3,6 +3,9 @@
 --- @version 1.0.0
 --- created at [24/05/2021 10:02]
 ---
+--- Ported To YimMenu-Lua by SAMURAI (xesdoog)
+--- File Modified: [02/01/2024 17:20]
+--- 
 
 
 ---CreateMenu
@@ -70,11 +73,11 @@ function RageUI.CreateMenu(Title, Subtitle, X, Y, TextureDictionary, TextureName
 		end
 	end
 
-	Citizen.CreateThread(function()
-		if not HasScaleformMovieLoaded(Menu.InstructionalScaleform) then
-			Menu.InstructionalScaleform = RequestScaleformMovie("INSTRUCTIONAL_BUTTONS")
-			while not HasScaleformMovieLoaded(Menu.InstructionalScaleform) do
-				Citizen.Wait(0)
+	script.run_in_fiber( function()
+		if not GRAPHICS.HAS_SCALEFORM_MOVIE_LOADED(Menu.InstructionalScaleform) then
+			Menu.InstructionalScaleform = GRAPHICS.REQUEST_SCALEFORM_MOVIE("INSTRUCTIONAL_BUTTONS")
+			while not GRAPHICS.HAS_SCALEFORM_MOVIE_LOADED(Menu.InstructionalScaleform) do
+				coroutine.yield()
 			end
 		end
 	end)
@@ -167,34 +170,35 @@ function RageUIMenus:RemoveInstructionButton(button)
 	end
 end
 
+---@param Visible boolean
 function RageUIMenus:UpdateInstructionalButtons(Visible)
 
 	if not Visible then
 		return
 	end
 
-	BeginScaleformMovieMethod(self.InstructionalScaleform, "CLEAR_ALL")
-	EndScaleformMovieMethod()
+	GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "CLEAR_ALL")
+	GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 
-	BeginScaleformMovieMethod(self.InstructionalScaleform, "TOGGLE_MOUSE_BUTTONS")
-	ScaleformMovieMethodAddParamInt(0)
-	EndScaleformMovieMethod()
+	GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "TOGGLE_MOUSE_BUTTONS")
+	GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0)
+	GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 
-	BeginScaleformMovieMethod(self.InstructionalScaleform, "CREATE_CONTAINER")
-	EndScaleformMovieMethod()
+	GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "CREATE_CONTAINER")
+	GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 
-	BeginScaleformMovieMethod(self.InstructionalScaleform, "SET_DATA_SLOT")
-	ScaleformMovieMethodAddParamInt(0)
-	PushScaleformMovieMethodParameterButtonName(GetControlInstructionalButton(2, 176, 0))
-	PushScaleformMovieMethodParameterString(GetLabelText("HUD_INPUT2"))
-	EndScaleformMovieMethod()
+	GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "SET_DATA_SLOT")
+	GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0)
+	GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(PAD.GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, 176, true))
+	GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT2"))
+	GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 
 	if self.Closable then
-		BeginScaleformMovieMethod(self.InstructionalScaleform, "SET_DATA_SLOT")
-		ScaleformMovieMethodAddParamInt(1)
-		PushScaleformMovieMethodParameterButtonName(GetControlInstructionalButton(2, 177, 0))
-		PushScaleformMovieMethodParameterString(GetLabelText("HUD_INPUT3"))
-		EndScaleformMovieMethod()
+		GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "SET_DATA_SLOT")
+		GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(1)
+		GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(PAD.GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, 177, true))
+		GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT3"))
+		GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 	end
 
 	local count = 2
@@ -203,27 +207,27 @@ function RageUIMenus:UpdateInstructionalButtons(Visible)
 		for i = 1, #self.InstructionalButtons do
 			if self.InstructionalButtons[i] then
 				if #self.InstructionalButtons[i] == 2 then
-					BeginScaleformMovieMethod(self.InstructionalScaleform, "SET_DATA_SLOT")
-					ScaleformMovieMethodAddParamInt(count)
-					PushScaleformMovieMethodParameterButtonName(self.InstructionalButtons[i][1])
-					PushScaleformMovieMethodParameterString(self.InstructionalButtons[i][2])
-					EndScaleformMovieMethod()
+					GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "SET_DATA_SLOT")
+					GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(count)
+					GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(self.InstructionalButtons[i][1])
+					GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(self.InstructionalButtons[i][2])
+					GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 					count = count + 1
 				end
 			end
 		end
 	end
 
-	BeginScaleformMovieMethod(self.InstructionalScaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
-	ScaleformMovieMethodAddParamInt(-1)
-	EndScaleformMovieMethod()
+	GRAPHICS.BEGIN_SCALEFORM_MOVIE_METHOD(self.InstructionalScaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
+	GRAPHICS.SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(-1)
+	GRAPHICS.END_SCALEFORM_MOVIE_METHOD()
 end
 
 ---IsVisible
 ---@param Item fun(Item:Items)
----@param Panel fun(Panel:Panels
+---@param Panel fun(Panel:Panels)
 function RageUIMenus:IsVisible(Item, Panel)
-	if (RageUI.Visible(self)) and (UpdateOnscreenKeyboard() ~= 0) and (UpdateOnscreenKeyboard() ~= 3) then
+	if (RageUI.Visible(self)) and (MISC.UPDATE_ONSCREEN_KEYBOARD() ~= 0) and (MISC.UPDATE_ONSCREEN_KEYBOARD() ~= 3) then
 		RageUI.Banner()
 		RageUI.Subtitle()
 		Item(Items);

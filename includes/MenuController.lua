@@ -3,6 +3,9 @@
 --- @version 1.0.0
 --- created at [24/05/2021 10:02]
 ---
+--- Ported To YimMenu-Lua by SAMURAI (xesdoog)
+--- File Modified: [02/01/2024 17:37]
+--- 
 
 RageUI.LastControl = false
 
@@ -111,22 +114,22 @@ function RageUI.GoActionControl(Controls, Action)
 	if Controls[Action or 'Left'].Enabled then
 		for Index = 1, #Controls[Action or 'Left'].Keys do
 			if not Controls[Action or 'Left'].Pressed then
-				if IsDisabledControlJustPressed(Controls[Action or 'Left'].Keys[Index][1], Controls[Action or 'Left'].Keys[Index][2]) then
+				if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(Controls[Action or 'Left'].Keys[Index][1], Controls[Action or 'Left'].Keys[Index][2]) then
 					Controls[Action or 'Left'].Pressed = true
-					Citizen.CreateThread(function()
+					script.run_in_fiber(function(gac)
 						Controls[Action or 'Left'].Active = true
-						Citizen.Wait(0.01)
+						gac:sleep(0.01)
 						Controls[Action or 'Left'].Active = false
-						Citizen.Wait(175)
-						while Controls[Action or 'Left'].Enabled and IsDisabledControlPressed(Controls[Action or 'Left'].Keys[Index][1], Controls[Action or 'Left'].Keys[Index][2]) do
+						gac:sleep(175)
+						while Controls[Action or 'Left'].Enabled and PAD.IS_DISABLED_CONTROL_PRESSED(Controls[Action or 'Left'].Keys[Index][1], Controls[Action or 'Left'].Keys[Index][2]) do
 							Controls[Action or 'Left'].Active = true
-							Citizen.Wait(1)
+							gac:sleep(1)
 							Controls[Action or 'Left'].Active = false
-							Citizen.Wait(124)
+							gac:sleep(124)
 						end
 						Controls[Action or 'Left'].Pressed = false
 						if (Action ~= ControlActions[5]) then
-							Citizen.Wait(10)
+							gac:sleep(10)
 						end
 					end)
 					break
@@ -140,15 +143,15 @@ function RageUI.GoActionControlSlider(Controls, Action)
 	if Controls[Action].Enabled then
 		for Index = 1, #Controls[Action].Keys do
 			if not Controls[Action].Pressed then
-				if IsDisabledControlJustPressed(Controls[Action].Keys[Index][1], Controls[Action].Keys[Index][2]) then
+				if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(Controls[Action].Keys[Index][1], Controls[Action].Keys[Index][2]) then
 					Controls[Action].Pressed = true
-					Citizen.CreateThread(function()
+					script.run_in_fiber(function(gacs)
 						Controls[Action].Active = true
-						Citizen.Wait(1)
+						gacs:sleep(1)
 						Controls[Action].Active = false
-						while Controls[Action].Enabled and IsDisabledControlPressed(Controls[Action].Keys[Index][1], Controls[Action].Keys[Index][2]) do
+						while Controls[Action].Enabled and PAD.IS_DISABLED_CONTROL_PRESSED(Controls[Action].Keys[Index][1], Controls[Action].Keys[Index][2]) do
 							Controls[Action].Active = true
-							Citizen.Wait(1)
+							gacs:sleep(1)
 							Controls[Action].Active = false
 						end
 						Controls[Action].Pressed = false
@@ -174,30 +177,30 @@ function RageUI.Controls()
 				local Options = CurrentMenu.Options
 				RageUI.Options = CurrentMenu.Options
 				if CurrentMenu.EnableMouse then
-					DisableAllControlActions(2)
+					PAD.DISABLE_ALL_CONTROL_ACTIONS(2)
 				end
 
-				if not IsInputDisabled(2) then
+				if not PAD.IS_USING_KEYBOARD_AND_MOUSE(2) then
 					for Index = 1, #Controls.Enabled.Controller do
-						EnableControlAction(Controls.Enabled.Controller[Index][1], Controls.Enabled.Controller[Index][2], true)
+						PAD.ENABLE_CONTROL_ACTION(Controls.Enabled.Controller[Index][1], Controls.Enabled.Controller[Index][2], true)
 					end
 				else
 					for Index = 1, #Controls.Enabled.Keyboard do
-						EnableControlAction(Controls.Enabled.Keyboard[Index][1], Controls.Enabled.Keyboard[Index][2], true)
+						PAD.ENABLE_CONTROL_ACTION(Controls.Enabled.Keyboard[Index][1], Controls.Enabled.Keyboard[Index][2], true)
 					end
 				end
 
 				if Controls.Up.Enabled then
 					for Index = 1, #Controls.Up.Keys do
 						if not Controls.Up.Pressed then
-							if IsDisabledControlJustPressed(Controls.Up.Keys[Index][1], Controls.Up.Keys[Index][2]) then
+							if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(Controls.Up.Keys[Index][1], Controls.Up.Keys[Index][2]) then
 								Controls.Up.Pressed = true
-								Citizen.CreateThread(function()
+								script.run_in_fiber(function(gu)
 									RageUI.GoUp(Options)
-									Citizen.Wait(175)
-									while Controls.Up.Enabled and IsDisabledControlPressed(Controls.Up.Keys[Index][1], Controls.Up.Keys[Index][2]) do
+									gu:sleep(175)
+									while Controls.Up.Enabled and PAD.IS_DISABLED_CONTROL_PRESSED(Controls.Up.Keys[Index][1], Controls.Up.Keys[Index][2]) do
 										RageUI.GoUp(Options)
-										Citizen.Wait(50)
+										gu:sleep(50)
 									end
 									Controls.Up.Pressed = false
 								end)
@@ -210,14 +213,14 @@ function RageUI.Controls()
 				if Controls.Down.Enabled then
 					for Index = 1, #Controls.Down.Keys do
 						if not Controls.Down.Pressed then
-							if IsDisabledControlJustPressed(Controls.Down.Keys[Index][1], Controls.Down.Keys[Index][2]) then
+							if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(Controls.Down.Keys[Index][1], Controls.Down.Keys[Index][2]) then
 								Controls.Down.Pressed = true
-								Citizen.CreateThread(function()
+								script.run_in_fiber(function(gd)
 									RageUI.GoDown(Options)
-									Citizen.Wait(175)
-									while Controls.Down.Enabled and IsDisabledControlPressed(Controls.Down.Keys[Index][1], Controls.Down.Keys[Index][2]) do
+									gd:sleep(175)
+									while Controls.Down.Enabled and PAD.IS_DISABLED_CONTROL_PRESSED(Controls.Down.Keys[Index][1], Controls.Down.Keys[Index][2]) do
 										RageUI.GoDown(Options)
-										Citizen.Wait(50)
+										gd:sleep(50)
 									end
 									Controls.Down.Pressed = false
 								end)
@@ -237,10 +240,10 @@ function RageUI.Controls()
 				if Controls.Back.Enabled then
 					for Index = 1, #Controls.Back.Keys do
 						if not Controls.Back.Pressed then
-							if IsDisabledControlJustPressed(Controls.Back.Keys[Index][1], Controls.Back.Keys[Index][2]) then
+							if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(Controls.Back.Keys[Index][1], Controls.Back.Keys[Index][2]) then
 								Controls.Back.Pressed = true
-								Citizen.CreateThread(function()
-									Citizen.Wait(175)
+								script.run_in_fiber(function(gb)
+									gb:sleep(175)
 									Controls.Down.Pressed = false
 								end)
 								break
@@ -262,7 +265,7 @@ function RageUI.Navigation()
 	if CurrentMenu ~= nil then
 		if CurrentMenu() and (CurrentMenu.Display.Navigation) then
 			if CurrentMenu.EnableMouse then
-				SetMouseCursorActiveThisFrame()
+				HUD.SET_MOUSE_CURSOR_THIS_FRAME()
 			end
 			if RageUI.Options > CurrentMenu.Pagination.Total then
 
@@ -277,8 +280,8 @@ function RageUI.Navigation()
 					if CurrentMenu.Safezone then
 						CurrentMenu.SafeZoneSize = RageUI.GetSafeZoneBounds()
 
-						SetScriptGfxAlign(76, 84)
-						SetScriptGfxAlignParams(0, 0, 0, 0)
+						GRAPHICS.SET_SCRIPT_GFX_ALIGN(76, 84)
+						GRAPHICS.SET_SCRIPT_GFX_ALIGN_PARAMS(0, 0, 0, 0)
 					end
 				end
 
