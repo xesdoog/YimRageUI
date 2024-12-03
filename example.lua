@@ -10,90 +10,65 @@
 --- Port Date: [02/01/2024 18:00]
 ---
 
-local basePath = 'includes/'
-local modules  = {
-    'RageUI',
-    'Menu',
-    'MenuController',
-    'components/Audio',
-    'components/Visual',
-    'components/Graphics',
-    'components/Util',
-    'components/Keys',
-    'elements/ItemsBadge',
-    'elements/ItemsColour',
-    'elements/PanelColour',
-    'items/Items',
-    'items/Panels',
-}
+require('includes/RageUI_init')
+require('includes/vehicle_spawner')
 
-for _, module in pairs(modules) do
-    require(string.format("%s%s", basePath, module))
-end
 
-local MainMenu = RageUI.CreateMenu("Title", "SUBTITLE");
-MainMenu.EnableMouse = true;
-
-local SubMenu = RageUI.CreateSubMenu(MainMenu, "Title", "SubTitle")
-
-local Checked = false;
-local ListIndex = 1;
-
-local GridX, GridY = 0, 0
+local MainMenu = RageUI.CreateMenu("YimRageUI", "Example RageUI Menu");
+-- MainMenu.EnableMouse = false
+local SubMenu       = RageUI.CreateSubMenu(MainMenu, "Submenu", "This is a submenu.")
+SubMenu.EnableMouse = true
+local SpawnInside   = false
+local vehicleNames  = GetVehicleNames()
+local ListIndex     = 1
+local GridX, GridY  = 0, 0
 
 function RageUI.PoolMenus:Example()
 	MainMenu:IsVisible(function(Items)
-		Items:Heritage(1, 2)
-		Items:AddButton("Sub Menu", "Sub Menu", { IsDisabled = false }, function(onSelected)
-
+		-- Items
+		Items:CheckBox("Spawn Inside", "Automatically teleport inside the vehicle when you spawn it.", SpawnInside, { Style = 1 }, function(onSelected, IsChecked)
+			if onSelected then
+				SpawnInside = IsChecked
+			end
+		end)
+		Items:AddList("Vehicle:", vehicleNames, ListIndex, "Press [Enter] to spawn the vehicle.", { IsDisabled = false }, function(Index, onSelected, onListChange)
+			if onListChange then
+				ListIndex = Index
+			end
+			if onSelected then
+				SpawnVeh(joaat(Vehicles_t[ListIndex]), SpawnInside)
+			end
+		end)
+		Items:AddSeparator("--- Separator ---")
+		Items:AddButton("Open Submenu", "This is a button that opens a submenu and enables the mouse.", { IsDisabled = false }, function()
 		end, SubMenu)
-		Items:AddButton("Hello world", "Hello world.", { IsDisabled = false }, function(onSelected)
-
-		end)
-		Items:AddList("List", { 1, 2, 3 }, ListIndex, nil, { IsDisabled = false }, function(Index, onSelected, onListChange)
-			if (onListChange) then
-				ListIndex = Index;
+		Items:AddButton("Show Message", "This is a button that simply displays a message.", { IsDisabled = false }, function(onSelected)
+			if onSelected then
+				gui.show_message("YimRageUI", "Hey there, partner!")
 			end
 		end)
-		Items:AddSeparator("Separator")
-		Items:CheckBox("Hello", "Descriptions", Checked, { Style = 1 }, function(onSelected, IsChecked)
-			if (onSelected) then
-				Checked = IsChecked
-			end
-		end)
+		Items:AddButton("Disabled Button", "This button is disabled.", { IsDisabled = true }, function() end)
 
 
-	end, function(Panels)
-		Panels:Grid(GridX, GridY, "Top", "Bottom", "Left", "Right", function(X, Y, CharacterX, CharacterY)
-			GridX = X;
-			GridY = Y;
-		end, 1)
+	end, function()
+		-- Panels
 	end)
 
 	SubMenu:IsVisible(function(Items)
 		-- Items
-		Items:AddButton("Hello world", "Hello world.", { IsDisabled = false }, function(onSelected)
+		Items:Heritage(math.round(GridX * 10), math.round(GridY * 10))
+		Items:AddButton("Example MP Player Heritage", "Press and hold [LMB] to move the circle around the grid.", { IsDisabled = false }, function() end)
 
-		end)
-	end, function()
+	end, function(Panels)
 		-- Panels
+		Panels:Grid(GridX, GridY, "Top", "Bottom", "Left", "Right", function(X, Y, _, _)
+			GridX = X
+			GridY = Y
+		end, 1)
 	end)
 end
 
-script.register_looped("RAGEUI", function(rageui)
-    while true do
-        RageUI.PoolMenus.Timer = 250
-        if RageUI.PoolMenus.Name ~= nil then
-            RageUI.PoolMenus[RageUI.PoolMenus.Name]()
-        end
-        rageui:sleep(RageUI.PoolMenus.Timer)
-        if RageUI.PoolMenus.Timer == 250 then
-            RageUI.PoolMenus.Name = nil
-            RageUI.Pool();
-        end
-    end
-end)
-
-RegisterKeyMapping("F5", "Test", function()
+RegisterKeyMapping("F5", "Open/Close UI", function()
+	Audio.PlaySound(RageUI.Settings.Audio.Select.audioName, RageUI.Settings.Audio.Select.audioRef, false)
 	RageUI.Visible(MainMenu, not RageUI.Visible(MainMenu))
 end)

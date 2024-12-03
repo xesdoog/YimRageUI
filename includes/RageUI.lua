@@ -490,3 +490,17 @@ function RageUI.Pool()
         end
     end
 end
+
+script.register_looped("RAGEUI", function(rageui)
+    while true do
+        RageUI.PoolMenus.Timer = 250
+        if RageUI.PoolMenus.Name ~= nil then
+            RageUI.PoolMenus[RageUI.PoolMenus.Name]()
+        end
+        rageui:sleep(RageUI.PoolMenus.Timer)
+        if RageUI.PoolMenus.Timer == 250 then
+            RageUI.PoolMenus.Name = nil
+            RageUI.Pool();
+        end
+    end
+end)

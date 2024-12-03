@@ -171,10 +171,9 @@ function RageUI.Controls()
 	if CurrentMenu ~= nil then
 		if CurrentMenu() then
 			if CurrentMenu.Open then
-
-				local Controls = CurrentMenu.Controls;
-
-				local Options = CurrentMenu.Options
+				PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
+				local Controls = CurrentMenu.Controls
+				local Options  = CurrentMenu.Options
 				RageUI.Options = CurrentMenu.Options
 				if CurrentMenu.EnableMouse then
 					PAD.DISABLE_ALL_CONTROL_ACTIONS(2)

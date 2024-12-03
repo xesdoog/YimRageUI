@@ -11,14 +11,14 @@
 ---CreateMenu
 ---@param Title string
 ---@param Subtitle string
----@param X number
----@param Y number
----@param TextureDictionary string
----@param TextureName string
----@param R number
----@param G number
----@param B number
----@param A number
+---@param X? number
+---@param Y? number
+---@param TextureDictionary? string
+---@param TextureName? string
+---@param R? number
+---@param G? number
+---@param B? number
+---@param A? number
 ---@return RageUIMenus
 ---@public
 function RageUI.CreateMenu(Title, Subtitle, X, Y, TextureDictionary, TextureName, R, G, B, A)
@@ -86,17 +86,17 @@ function RageUI.CreateMenu(Title, Subtitle, X, Y, TextureDictionary, TextureName
 end
 
 ---CreateSubMenu
----@param ParentMenu function
+---@param ParentMenu RageUIMenus
 ---@param Title string
 ---@param Subtitle string
----@param X number
----@param Y number
----@param TextureDictionary string
----@param TextureName string
----@param R number
----@param G number
----@param B number
----@param A number
+---@param X? number
+---@param Y? number
+---@param TextureDictionary? string
+---@param TextureName? string
+---@param R? number
+---@param G? number
+---@param B? number
+---@param A? number
 ---@return RageUIMenus
 ---@public
 function RageUI.CreateSubMenu(ParentMenu, Title, Subtitle, X, Y, TextureDictionary, TextureName, R, G, B, A)
@@ -240,11 +240,6 @@ function RageUIMenus:IsVisible(Item, Panel)
 	end
 end
 
-function RageUIMenus:KeysRegister(Controls, ControlName, Description, Action)
-	RegisterKeyMapping(string.format('riv-%s', ControlName), Description, "keyboard", Controls)
-	RegisterCommand(string.format('riv-%s', ControlName), function(source, args)
-		if (Action ~= nil) then
-			Action();
-		end
-	end, false)
+function RageUIMenus:KeysRegister(ControlName, Description, Action)
+	RegisterKeyMapping(ControlName, Description, Action)
 end
