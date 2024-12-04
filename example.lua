@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global, lowercase-global
+---@diagnostic disable
 ---
 --- @author Dylan MALANDAIN, Kalyptus
 --- @version 1.0.0
@@ -14,14 +14,29 @@ require('includes/RageUI_init')
 require('includes/vehicle_spawner')
 
 
-local MainMenu = RageUI.CreateMenu("YimRageUI", "Example RageUI Menu");
--- MainMenu.EnableMouse = false
-local SubMenu       = RageUI.CreateSubMenu(MainMenu, "Submenu", "This is a submenu.")
+local MenuPosition = vec2:new(1, 1)
+local vehicleNames = GetVehicleNames()
+local SpawnInside  = false
+local MenuPos_x    = {}
+local MenuPos_y    = {}
+local ListIndex    = 1
+local GridX, GridY = 0, 0
+
+for x = 1, 1600 do
+	table.insert(MenuPos_x, x)
+end
+
+for y = 1, 900 do
+	table.insert(MenuPos_y, y)
+end
+
+
+local MainMenu = RageUI.CreateMenu("YimRageUI", "Example RageUI Menu", MenuPosition.x, MenuPosition.y)
+-- MainMenu.EnableMouse = true
+local SubMenu = RageUI.CreateSubMenu(MainMenu, "Submenu", "This is an example submenu.")
+local SettingsSubMenu = RageUI.CreateSubMenu(MainMenu, "Settings", "Example settings submenu.")
 SubMenu.EnableMouse = true
-local SpawnInside   = false
-local vehicleNames  = GetVehicleNames()
-local ListIndex     = 1
-local GridX, GridY  = 0, 0
+SettingsSubMenu.EnableMouse = false
 
 function RageUI.PoolMenus:Example()
 	MainMenu:IsVisible(function(Items)
@@ -31,6 +46,7 @@ function RageUI.PoolMenus:Example()
 				SpawnInside = IsChecked
 			end
 		end)
+
 		Items:AddList("Vehicle:", vehicleNames, ListIndex, "Press [Enter] to spawn the vehicle.", { IsDisabled = false }, function(Index, onSelected, onListChange)
 			if onListChange then
 				ListIndex = Index
@@ -39,16 +55,22 @@ function RageUI.PoolMenus:Example()
 				SpawnVeh(joaat(Vehicles_t[ListIndex]), SpawnInside)
 			end
 		end)
+
 		Items:AddSeparator("--- Separator ---")
-		Items:AddButton("Open Submenu", "This is a button that opens a submenu and enables the mouse.", { IsDisabled = false }, function()
-		end, SubMenu)
+
 		Items:AddButton("Show Message", "This is a button that simply displays a message.", { IsDisabled = false }, function(onSelected)
 			if onSelected then
 				gui.show_message("YimRageUI", "Hey there, partner!")
 			end
 		end)
+
 		Items:AddButton("Disabled Button", "This button is disabled.", { IsDisabled = true }, function() end)
 
+		Items:AddButton("Open Submenu", "This is a button that opens a submenu and enables the mouse.", { IsDisabled = false }, function()
+		end, SubMenu)
+
+		Items:AddButton("Menu Settings", "This is a button that opens a settings submenu.", { IsDisabled = false }, function()
+		end, SettingsSubMenu)
 
 	end, function()
 		-- Panels
@@ -57,6 +79,7 @@ function RageUI.PoolMenus:Example()
 	SubMenu:IsVisible(function(Items)
 		-- Items
 		Items:Heritage(math.round(GridX * 10), math.round(GridY * 10))
+
 		Items:AddButton("Example MP Player Heritage", "Press and hold [LMB] to move the circle around the grid.", { IsDisabled = false }, function() end)
 
 	end, function(Panels)
@@ -65,6 +88,38 @@ function RageUI.PoolMenus:Example()
 			GridX = X
 			GridY = Y
 		end, 1)
+	end)
+
+	SettingsSubMenu:IsVisible(function(Items)
+		-- Items
+		Items:AddList("Menu X:", MenuPos_x, MenuPosition.x or 0, "Move left/right", { IsDisabled = false }, function(Index, onSelected, onListChange)
+			if onListChange then
+				MenuPosition.x = Index
+				MainMenu.X = MenuPosition.x
+				SubMenu.X = MenuPosition.x
+				SettingsSubMenu.X = MenuPosition.x
+			end
+		end)
+
+		Items:AddList("Menu Y:", MenuPos_y, MenuPosition.y or 0, "Move up/down", { IsDisabled = false }, function(Index, onSelected, onListChange)
+			if onListChange then
+				MenuPosition.y = Index
+				MainMenu.Y = MenuPosition.y
+				SubMenu.Y = MenuPosition.y
+				SettingsSubMenu.Y = MenuPosition.y
+			end
+		end)
+
+		Items:AddList("Theme", { "Light" }, 1, "Test_a", { IsDisabled = true }, function() end)
+
+		Items:AddList("Type", { "commonmenu" }, 1, "Test_b", { IsDisabled = true }, function() end)
+
+		Items:AddList("Backgroud", { "gradient_bgd" }, 1, "Test_c", { IsDisabled = true }, function() end)
+
+		Items:AddList("Text Colour", { "Default" }, 1, "Test_d", { IsDisabled = true }, function() end)
+
+	end, function()
+		-- Panels
 	end)
 end
 

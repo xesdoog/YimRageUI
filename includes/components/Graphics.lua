@@ -127,7 +127,7 @@ function Graphics.ScreenToWorld(distance, flags)
     local camPos = CAM.GET_GAMEPLAY_CAM_COORD()
     local mouse  = vec2:new(PAD.GET_CONTROL_NORMAL(2, 239), PAD.GET_CONTROL_NORMAL(2, 240))
     local cam3DPos, forwardDir = Graphics.ScreenRelToWorld(camPos, camRot, mouse)
-    local direction = vec3:add(camPos, vec3:mult(forwardDir, distance))
+    local direction = camPos + forwardDir * distance
     local rayHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
         cam3DPos.x, cam3DPos.y, cam3DPos.z,
         direction.x, direction.y, direction.z,
@@ -136,29 +136,33 @@ function Graphics.ScreenToWorld(distance, flags)
 
     local _, hit, endCoords, surfaceNormal, entityHit = SHAPETEST.GET_SHAPE_TEST_RESULT(
         rayHandle, hit, endCoords, surfaceNormal, entityHit
-        )
+    )
+
     return hit, endCoords, surfaceNormal, entityHit, (entityHit >= 1 and ENTITY.GET_ENTITY_TYPE(entityHit) or 0), direction, mouse
 end
 
+---@param camPos vec3
+---@param camRot vec3
+---@param cursor vec2
 function Graphics.ScreenRelToWorld(camPos, camRot, cursor)
     local camForward   = Graphics.RotationToDirection(camRot)
     local rotUp        = vec3:new(camRot.x + 1.0, camRot.y, camRot.z)
     local rotDown      = vec3:new(camRot.x - 1.0, camRot.y, camRot.z)
     local rotLeft      = vec3:new(camRot.x, camRot.y, camRot.z - 1.0)
     local rotRight     = vec3:new(camRot.x, camRot.y, camRot.z + 1.0)
-    local camRight     = vec3:sub(Graphics.RotationToDirection(rotRight), Graphics.RotationToDirection(rotLeft))
-    local camUp        = vec3:sub(Graphics.RotationToDirection(rotUp), Graphics.RotationToDirection(rotDown))
+    local camRight     = Graphics.RotationToDirection(rotRight) - Graphics.RotationToDirection(rotLeft)
+    local camUp        = Graphics.RotationToDirection(rotUp) - Graphics.RotationToDirection(rotDown)
     local rollRad      = -(camRot.y * math.pi / 180.0)
-    local camRightRoll = vec3:sub(vec3:mult(camRight, math.cos(rollRad)), vec3:mult(camUp, math.sin(rollRad)))
-    local camUpRoll    = vec3:add(vec3:mult(camRight, math.sin(rollRad)), vec3:mult(camUp, math.cos(rollRad)))
-    local point3DZero  = vec3:add(camPos, vec3:mult(camForward, 1.0))
-    local point3D      = vec3:add(vec3:add(point3DZero, camRightRoll), camUpRoll)
+    local camRightRoll = camRight * math.cos(rollRad) - camUp * math.sin(rollRad)
+    local camUpRoll    = camRight * math.sin(rollRad) + camUp * math.cos(rollRad)
+    local point3DZero  = camPos + camForward * 1.0
+    local point3D      = point3DZero + camRightRoll + camUpRoll
     local point2D      = Graphics.World3DToScreen2D(point3D)
     local point2DZero  = Graphics.World3DToScreen2D(point3DZero)
     local scaleX       = (cursor.x - point2DZero.x) / (point2D.x - point2DZero.x)
     local scaleY       = (cursor.y - point2DZero.y) / (point2D.y - point2DZero.y)
-    local point3Dret   = vec3:add(vec3:add(point3DZero, vec3:mult(camRightRoll, scaleX)), vec3:mult(camUpRoll, scaleY))
-    local forwardDir   = vec3:add(vec3:add(camForward, vec3:mult(camRightRoll, scaleX)), vec3:mult(camUpRoll, scaleY))
+    local point3Dret   = point3DZero + camRightRoll * scaleX + camUpRoll * scaleY
+    local forwardDir   = camForward + camRightRoll * scaleX + camUpRoll * scaleY
     return point3Dret, forwardDir
 end
 

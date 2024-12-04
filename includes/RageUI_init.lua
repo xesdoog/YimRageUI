@@ -1,5 +1,7 @@
 local basePath = 'includes/'
 local modules  = {
+    'classes/vector2',
+    'classes/vector3',
     'RageUI',
     'Menu',
     'MenuController',

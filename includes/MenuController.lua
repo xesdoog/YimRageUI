@@ -268,9 +268,7 @@ function RageUI.Navigation()
 			end
 			if RageUI.Options > CurrentMenu.Pagination.Total then
 
-
-				local UpHovered = false
-
+				local UpHovered   = false
 				local DownHovered = false
 
 				if not CurrentMenu.SafeZoneSize then
@@ -278,7 +276,6 @@ function RageUI.Navigation()
 
 					if CurrentMenu.Safezone then
 						CurrentMenu.SafeZoneSize = RageUI.GetSafeZoneBounds()
-
 						GRAPHICS.SET_SCRIPT_GFX_ALIGN(76, 84)
 						GRAPHICS.SET_SCRIPT_GFX_ALIGN_PARAMS(0, 0, 0, 0)
 					end

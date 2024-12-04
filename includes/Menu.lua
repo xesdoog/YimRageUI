@@ -86,7 +86,7 @@ function RageUI.CreateMenu(Title, Subtitle, X, Y, TextureDictionary, TextureName
 end
 
 ---CreateSubMenu
----@param ParentMenu RageUIMenus
+---@param ParentMenu function
 ---@param Title string
 ---@param Subtitle string
 ---@param X? number
