@@ -123,8 +123,8 @@ function Graphics.ConvertToPixel(x, y)
 end
 
 function Graphics.ScreenToWorld(distance, flags)
-    local camRot = CAM.GET_GAMEPLAY_CAM_ROT(0)
-    local camPos = CAM.GET_GAMEPLAY_CAM_COORD()
+    local camRot = toVec3(CAM.GET_GAMEPLAY_CAM_ROT(0))
+    local camPos = toVec3(CAM.GET_GAMEPLAY_CAM_COORD())
     local mouse  = vec2:new(PAD.GET_CONTROL_NORMAL(2, 239), PAD.GET_CONTROL_NORMAL(2, 240))
     local cam3DPos, forwardDir = Graphics.ScreenRelToWorld(camPos, camRot, mouse)
     local direction = camPos + forwardDir * distance
